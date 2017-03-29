@@ -1,3 +1,6 @@
+/**
+ * Encapsulates some resources access
+ */
 const resources = {
 
     getSpawn: (roomName) => {

@@ -2,7 +2,6 @@ resources = require('resources')
 
 const roleHarvester = {
 
-    /** @param {Creep} worker **/
     run: function(workers) {
         for (i in workers) {
             var worker = workers[i]

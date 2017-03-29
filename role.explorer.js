@@ -1,12 +1,15 @@
 resources = require('resources')
 
+/**
+ * Assings a very rudimentary logic to find new rooms
+ */
 const roleExplorer = {
 
-    /** @param {Creep} worker **/
     run: function(workers) {
         for (i in workers) {
             var worker = workers[i]
             worker.say(worker.memory.role)
+            // First time this explorer run this role, we need to set some info
             if (!worker.memory.lastRoomName) {
                 worker.memory.lastRoomName = worker.room.name
                 worker.memory.lastPosition = worker.pos
@@ -14,13 +17,14 @@ const roleExplorer = {
                 Memory.exits.push({
                     roomName: worker.room.name
                 })
-            }
-            if (!worker.memory.lastRoomName || worker.memory.lastRoomName !== worker.room.name) {
+            // If the explorer is in a room different from the last one saved
+            } else if (worker.memory.lastRoomName !== worker.room.name) {
                 worker.memory.lastRoomName = worker.room.name
                 const alreadyFound = _.find(Memory.exits, {'roomName': worker.room.name})
                 // Is that a new room?!
                 if (!alreadyFound || alreadyFound.length == 0) {
                     console.log('explorer found a new room:', worker.room.name)
+                    // Saves relevant information about the room in the memory
                     Memory.exits.push({
                         roomName: worker.room.name,
                         exitPoint: worker.pos,
@@ -29,12 +33,14 @@ const roleExplorer = {
                         energySources: worker.room.find(FIND_SOURCES)
                     })
                 } else {
-                    // She's back again, let's randomize the direction
+                    // She's back to a known room, let's randomize the direction
                     this.changeDirection(worker)
                 }
             }
+            // Tells the explorer to move
             worker.move(worker.memory.directions[0])
             const lastPosition = new RoomPosition(worker.memory.lastPosition.x, worker.memory.lastPosition.y, worker.room.name)
+            // If she didn't move, it's facing an obstacle, we need to change direction
             if (_.isEqual(worker.pos, lastPosition)) {
                 this.changeDirection(worker)
             } else {

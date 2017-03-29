@@ -1,26 +1,27 @@
 C = require('constants')
 resources = require('resources')
 
-// Sets the tasks for each creep type, based on the global energy level
+/**
+ * Controls the population numbers
+ */
 const population = {
 
-    creepsByRole: (creeps) => {
-        return _.reduce(creeps, (memo, creep) => {
-            if (memo[creep.memory.role] == undefined) memo[creep.memory.role] = []
-            memo[creep.memory.role].push(creep)
+    /**
+     * Categorize workers
+     */
+    workersByRole: (workers) => {
+        return _.reduce(workers, (memo, worker) => {
+            if (memo[worker.memory.role] == undefined) memo[worker.memory.role] = []
+            memo[worker.memory.role].push(worker)
             return memo
         }, {});
     },
 
-    changeEnergySource: (workers, energySourceId) => {
-        workers.forEach( (worker) => { worker.memory.energySource = energySourceId })
-    },
-
+    /**
+     * Creates new workers if needed
+     */
     check: (workersByRole, room) => {
-        // console.log(JSON.stringify(workersByRole, null, 2))
-        // _.forIn(workersByRole, (workers, role) => {
-        //     console.log(role, ':', workers.length)
-        // })
+        // Sums up the harvesters energy carry capacity
         const harvestersTotalCapacity = _.reduce(workersByRole[C.WORKERS.ROLE.HARVESTER], (memo, worker) => {
             return memo + worker.carryCapacity
         }, 0)
@@ -31,20 +32,23 @@ const population = {
         if (harvestersTotalCapacity < room.energyCapacityAvailable) {
             return population.newWorker(C.WORKERS.ROLE.HARVESTER, room)
         }
-        // Two builders per level
+        // Are there enough builders for this level?
         if (!workersByRole[C.WORKERS.ROLE.BUILDER] || workersByRole[C.WORKERS.ROLE.BUILDER].length < C.WORKERS.MINIMUM_BUILDERS_PER_LEVEL * controller.level) {
             return population.newWorker(C.WORKERS.ROLE.BUILDER, room)
         }
-        // Four upgraders per level
+        // Are there enough upgraders for this level?
         if (!workersByRole[C.WORKERS.ROLE.UPGRADER] || workersByRole[C.WORKERS.ROLE.UPGRADER].length < C.WORKERS.MINIMUM_UPGRADERS_PER_LEVEL * controller.level) {
             return population.newWorker(C.WORKERS.ROLE.UPGRADER, room)
         }
-        // One explorer per level
+        // Are there enough explorers for this level?
         if (!workersByRole[C.WORKERS.ROLE.EXPLORER] || workersByRole[C.WORKERS.ROLE.EXPLORER].length < controller.level) {
             return population.newExplorer(room.name)
         }
     },
 
+    /**
+     * Creates a new explorer
+     */
     newExplorer: (roomName) => {
         const bodyParts = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
         const name = resources.getSpawn(roomName).createCreep(bodyParts, undefined, {role: C.WORKERS.ROLE.EXPLORER})
@@ -53,12 +57,13 @@ const population = {
         }
     },
 
+    /**
+     * Creates a new worker (harvester, upgrader or builder)
+     */
     newWorker: (role, room) => {
-        // Not enough energy to create a worker
-        // TODO: improve exit logic to avoid creation attempt failure because of lack of energy
-        // if (room.energyAvailable < room.energyCapacityAvailable) return null
         const roomEnergyCapacity = room.energyCapacityAvailable
         let bodyParts = null
+        // The skillset depends on the enegy capacity available
         switch (roomEnergyCapacity) {
             case 300: {
                 bodyParts = [WORK, CARRY, MOVE, MOVE, MOVE]
@@ -86,7 +91,7 @@ const population = {
             }
         }
 
-        // Checks if there's enough energy
+        // Checks if there's enough energy to create this worker
         const energyNeeded = _.reduce(bodyParts, (memo, part) => {
             return memo += C.WORKERS.PART_WEIGHTS[part]
         }, 0)

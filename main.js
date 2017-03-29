@@ -4,28 +4,22 @@ var roleBuilder = require('role.builder')
 var roleExplorer = require('role.explorer')
 var population = require('population')
 var infrastructure = require('infrastructure')
-var resources = require('resources')
 var _ = require('lodash')
 
 /**
-    Strategy:
-        - priority 1: keep room energy level by dedicated workers
-        - priority 2: upgrade the controller by dedicated workers
-        - build roads
-        - extract minerals
+    Goals:
+        - keep room energy level by dedicated workers
+        - upgrade the controller by dedicated workers
+        - build roads linking resources to containers
         - keep upgrading workers as room capacity expands
+        - explore new rooms to enable harvesting new energy sources
 **/
 
 module.exports.loop = function () {
 
-    // _.forIn(Game.creeps, (creep) => {  creep.suicide() })
-
-    // Memory.creeps = undefined
-    // Memory.W5N8 = undefined
-
-    // TODO: set the nearest energy source for harvesters
-    // TODO: handle multiple rooms
+    // Iterates over the available rooms
     _.forIn(Game.rooms, (room) => {
+        // Saves some references for easier access
         if (!Memory[room.name]) {
             const spawn = _.filter(Game.spawns, (spawn) => {
                 return spawn.room.name == room.name
@@ -40,18 +34,25 @@ module.exports.loop = function () {
             }
         }
 
+        // If this room has no spawn, it isn't ours
         if (!Memory[room.name].structures.spawn) {
             console.log('Room', room.name, 'not mine... yet!')
             return
         }
 
-        const categorizedCreeps = population.creepsByRole(Game.creeps)
-        population.check(categorizedCreeps, room)
-        //
-        if (!_.isEmpty(categorizedCreeps.harvester)) roleHarvester.run(categorizedCreeps.harvester)
-        if (!_.isEmpty(categorizedCreeps.upgrader)) roleUpgrader.run(categorizedCreeps.upgrader)
-        if (!_.isEmpty(categorizedCreeps.builder)) roleBuilder.run(categorizedCreeps.builder)
-        if (!_.isEmpty(categorizedCreeps.explorer)) roleExplorer.run(categorizedCreeps.explorer)
+        // Cateorize creeps based on their roles
+        const categorizedWorkers = population.workersByRole(Game.creeps)
+
+        // Checks if there's need for creating new workers
+        population.check(categorizedWorkers, room)
+
+        // Runs each worker role logic
+        if (!_.isEmpty(categorizedWorkers.harvester)) roleHarvester.run(categorizedWorkers.harvester)
+        if (!_.isEmpty(categorizedWorkers.upgrader)) roleUpgrader.run(categorizedWorkers.upgrader)
+        if (!_.isEmpty(categorizedWorkers.builder)) roleBuilder.run(categorizedWorkers.builder)
+        if (!_.isEmpty(categorizedWorkers.explorer)) roleExplorer.run(categorizedWorkers.explorer)
+
+        // Checks for infrasctructure upgrades
         infrastructure.check(room)
 
         //TODO: clean dead creeps from memory
