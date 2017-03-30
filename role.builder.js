@@ -49,7 +49,7 @@ const roleBuilder = {
         // Time to gather energy
         } else {
             // Switches the energy source depending on the task assigned
-            const energySource = helpUpgraders ? Game.getObjectById(worker.memory.energySource.id) : Game.getObjectById(resources.getUpgradeEnergySources(worker.room.name).id)
+            const energySource = helpUpgraders ? Game.getObjectById(resources.getUpgradeEnergySources(worker.room.name).id) : Game.getObjectById(worker.memory.energySource.id)
             const harvestResult = worker.harvest(energySource)
             if (harvestResult == ERR_NOT_IN_RANGE) {
                 worker.moveTo(energySource, {visualizePathStyle: {stroke: '#ffaa00'}})
