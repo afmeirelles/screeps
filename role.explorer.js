@@ -6,9 +6,7 @@ resources = require('resources')
 const roleExplorer = {
 
     run: function(workers) {
-        for (i in workers) {
-            var worker = workers[i]
-            worker.say(worker.memory.role)
+        workers.forEach( (worker) => {
             // First time this explorer run this role, we need to set some info
             if (!worker.memory.lastRoomName) {
                 worker.memory.lastRoomName = worker.room.name
@@ -46,7 +44,7 @@ const roleExplorer = {
             } else {
                 worker.memory.lastPosition = worker.pos
             }
-        }
+        })
     },
 
     changeDirection: (worker) => {

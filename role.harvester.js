@@ -6,8 +6,7 @@ resources = require('resources')
 const roleHarvester = {
 
     run: function(workers) {
-        for (i in workers) {
-            var worker = workers[i]
+        workers.forEach( (worker) => {
 
             // Changes the task depending on the current energy payload
             if (worker.carry.energy == 0) {
@@ -60,7 +59,7 @@ const roleHarvester = {
                     worker.moveTo(resources.getSpawn(worker.room.name))
                 }
             }
-        }
+        })
 	}
 }
 

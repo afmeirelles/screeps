@@ -5,8 +5,7 @@ resources = require('resources')
 const roleBuilder = {
 
     run: function(workers) {
-      for (i in workers) {
-        var worker = workers[i]
+      workers.forEach( (worker) => {
 
         // Checks whether the workers should be building
         if (worker.memory.building && worker.carry.energy == 0) {
@@ -56,7 +55,7 @@ const roleBuilder = {
                 worker.moveTo(energySource, {visualizePathStyle: {stroke: '#ffaa00'}})
             }
         }
-      }
+    })
 	}
 }
 

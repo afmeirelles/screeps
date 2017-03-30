@@ -6,8 +6,7 @@ resources = require('resources')
 const roleUpgrader = {
 
     run: function(workers) {
-        for (i in workers) {
-            var worker = workers[i]
+        workers.forEach( (worker) => {
 
             // Checks what should this upgrader do
             if (worker.memory.upgrading && worker.carry.energy == 0) {
@@ -27,7 +26,7 @@ const roleUpgrader = {
                     worker.moveTo(energySource, {visualizePathStyle: {stroke: '#ffaa00'}});
                 }
             }
-        }
+        })
 	}
 }
 
