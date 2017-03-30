@@ -1,11 +1,15 @@
 resources = require('resources')
 
+/**
+ * Defines the harvester role
+ */
 const roleHarvester = {
 
     run: function(workers) {
         for (i in workers) {
             var worker = workers[i]
 
+            // Changes the task depending on the current energy payload
             if (worker.carry.energy == 0) {
                 worker.memory.assignedTask = C.WORKERS.TASKS.HARVEST
                 worker.memory.targetId = null
@@ -21,10 +25,8 @@ const roleHarvester = {
                 }
             // Defines the target structure to transfer energy to
             } else if (worker.memory.assignedTask == C.WORKERS.TASKS.TRANSFER) {
-                // If there is a defined target
                 let structure = resources.getStructureForWorker(worker.memory.targetId)
                 // If this there's no target locked or if this strucure is fully charged
-                // if (worker.name == 'Max') {console.log(worker.memory.targetId, !structure, structure.energyLevel == 1)}
                 if (!structure || structure.energyLevel == 1) {
                     // Looks for another one
                     const targets = worker.room.find(FIND_STRUCTURES, {
@@ -32,11 +34,13 @@ const roleHarvester = {
                             return (structure.structureType == STRUCTURE_EXTENSION || structure.structureType == STRUCTURE_SPAWN) && structure.energy < structure.energyCapacity;
                         }
                     })
+                    // Locks a new target if found
                     if (targets.length > 0) {
                         structure = targets[0]
                         worker.memory.targetId = targets[0].id
+                    // All strucures charged
                     } else {
-                        // All strucures charged
+                        // TODO: assign other tasks to harvester depending on the idle rounds #
                         worker.memory.idleRounds++
                     }
                 }
@@ -50,12 +54,14 @@ const roleHarvester = {
                     } else if (transferResult == ERR_INVALID_TARGET) {
                         worker.memory.targetId = null
                     }
+                // If there's no work to do, go back to spawn, so everyone is near and loaded
+                // when the spawn needs energy again
                 } else {
                     worker.moveTo(resources.getSpawn(worker.room.name))
                 }
             }
         }
 	}
-};
+}
 
 module.exports = roleHarvester;
