@@ -20,7 +20,7 @@ const roleHarvester = {
                 const energySource = Game.getObjectById(worker.memory.energySource.id)
                 const harvestResult = worker.harvest(energySource)
                 if (harvestResult == ERR_NOT_IN_RANGE) {
-                    worker.moveTo(energySource, {visualizePathStyle: {stroke: '#ffaa00'}});
+                    worker.moveTo(energySource);
                 }
             // Defines the target structure to transfer energy to
             } else if (worker.memory.assignedTask == C.WORKERS.TASKS.TRANSFER) {
@@ -48,7 +48,7 @@ const roleHarvester = {
                     const transferResult = worker.transfer(structure, RESOURCE_ENERGY)
                     // Moves toward the structure if not in range
                     if (transferResult == ERR_NOT_IN_RANGE) {
-                        worker.moveTo(structure, {visualizePathStyle: {stroke: '#ffffff'}})
+                        worker.moveTo(structure)
                     // Changes the target if it's invalid
                     } else if (transferResult == ERR_INVALID_TARGET) {
                         worker.memory.targetId = null

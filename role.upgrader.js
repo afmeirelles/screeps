@@ -18,12 +18,12 @@ const roleUpgrader = {
             // Upgrade the controller
       	    if (worker.memory.upgrading) {
                   if(worker.upgradeController(worker.room.controller) == ERR_NOT_IN_RANGE) {
-                      worker.moveTo(worker.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+                      worker.moveTo(worker.room.controller);
                   }
             } else {
                 const energySource = Game.getObjectById(worker.memory.energySource.id)
                 if (worker.harvest(energySource) == ERR_NOT_IN_RANGE) {
-                    worker.moveTo(energySource, {visualizePathStyle: {stroke: '#ffaa00'}});
+                    worker.moveTo(energySource);
                 }
             }
         })

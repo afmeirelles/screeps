@@ -1,10 +1,10 @@
-var roleHarvester = require('role.harvester')
-var roleUpgrader = require('role.upgrader')
-var roleBuilder = require('role.builder')
-var roleExplorer = require('role.explorer')
-var population = require('population')
-var infrastructure = require('infrastructure')
-var _ = require('lodash')
+const roleHarvester = require('role.harvester')
+const roleUpgrader = require('role.upgrader')
+const roleBuilder = require('role.builder')
+const roleExplorer = require('role.explorer')
+const population = require('population')
+const infrastructure = require('infrastructure')
+const _ = require('lodash')
 
 /**
     Goals:
@@ -36,7 +36,6 @@ module.exports.loop = function () {
 
         // If this room has no spawn, it isn't ours
         if (!Memory[room.name].structures.spawn) {
-            console.log('Room', room.name, 'not mine... yet!')
             return
         }
 
@@ -50,7 +49,7 @@ module.exports.loop = function () {
         if (!_.isEmpty(categorizedWorkers.harvester)) roleHarvester.run(categorizedWorkers.harvester)
         if (!_.isEmpty(categorizedWorkers.upgrader)) roleUpgrader.run(categorizedWorkers.upgrader)
         if (!_.isEmpty(categorizedWorkers.builder)) roleBuilder.run(categorizedWorkers.builder)
-        if (!_.isEmpty(categorizedWorkers.explorer)) roleExplorer.run(categorizedWorkers.explorer)
+        if (!_.isEmpty(categorizedWorkers.explorer)) roleExplorer.run(categorizedWorkers.explorer, room.name)
 
         // Checks for infrasctructure upgrades
         infrastructure.check(room)

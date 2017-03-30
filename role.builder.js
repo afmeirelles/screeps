@@ -37,13 +37,13 @@ const roleBuilder = {
             // There is work to be done, tell the worker to build
             if (constructionSite) {
                 if (worker.build(constructionSite) == ERR_NOT_IN_RANGE) {
-                    worker.moveTo(constructionSite, {visualizePathStyle: {stroke: '#ffff99'}});
+                    worker.moveTo(constructionSite);
                 }
             // If there's nothing to build, tell them to help the upgraders
             } else {
                 const helpUpgraders = true
                 if (worker.upgradeController(worker.room.controller) == ERR_NOT_IN_RANGE) {
-                    worker.moveTo(worker.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
+                    worker.moveTo(worker.room.controller);
                 }
             }
         // Time to gather energy
@@ -52,7 +52,7 @@ const roleBuilder = {
             const energySource = helpUpgraders ? Game.getObjectById(resources.getUpgradeEnergySources(worker.room.name).id) : Game.getObjectById(worker.memory.energySource.id)
             const harvestResult = worker.harvest(energySource)
             if (harvestResult == ERR_NOT_IN_RANGE) {
-                worker.moveTo(energySource, {visualizePathStyle: {stroke: '#ffaa00'}})
+                worker.moveTo(energySource)
             }
         }
     })
