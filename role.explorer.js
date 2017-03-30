@@ -1,62 +1,55 @@
 resources = require('resources')
+
 /**
- * Defines the builder role
+ * Assings a very rudimentary logic to find new rooms
  */
-const roleBuilder = {
+const roleExplorer = {
 
     run: function(workers, mainRoomName) {
-      workers.forEach( (worker) => {
-
-        // Checks whether the workers should be building
-        if (worker.memory.building && worker.carry.energy == 0) {
-            worker.memory.building = false;
-  	    }
-  	    if (!worker.memory.building && worker.carry.energy == worker.carryCapacity) {
-  	        worker.memory.building = true;
-  	    }
-
-        const helpUpgraders = false
-
-  	    if (worker.memory.building) {
-            // Gets the build target
-            let constructionSite = Game.getObjectById(worker.memory.targetId)
-            // If this there's no target locked
-            if (!constructionSite) {
-                // Checks for construction sites
-                const unfinishedBuildings = worker.room.find(FIND_CONSTRUCTION_SITES, {
-                    filter: (site) => {
-                        return site.progress < site.progressTotal
-                    }
+        workers.forEach( (worker) => {
+            // First time this explorer run this role, we need to set some info
+            if (!worker.memory.lastRoomName) {
+                worker.memory.lastRoomName = worker.room.name
+                worker.memory.lastPosition = worker.pos
+                worker.memory.directions = [TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, TOP_LEFT]
+                Memory[mainRoomName].exits.push({
+                    roomName: worker.room.name
                 })
-                // If there are unfinished buildings, lock it as the target
-                if (unfinishedBuildings.length) {
-                    constructionSite = unfinishedBuildings.pop()
-                    worker.memory.targetId = constructionSite.id
+            // If the explorer is in a room different from the last one saved
+            } else if (worker.memory.lastRoomName !== worker.room.name) {
+                worker.memory.lastRoomName = worker.room.name
+                const alreadyFound = _.find(Memory[mainRoomName].exits, {'roomName': worker.room.name})
+                // Is that a new room?!
+                if (!alreadyFound || alreadyFound.length == 0) {
+                    console.log('explorer found a new room:', worker.room.name)
+                    // Saves relevant information about the room in the memory
+                    Memory[mainRoomName].exits.push({
+                        roomName: worker.room.name,
+                        exitPoint: worker.pos,
+                        originRoom: worker.memory.lastRoomName,
+                        controllerPosition: worker.room.controller.pos,
+                        energySources: worker.room.find(FIND_SOURCES)
+                    })
+                } else {
+                    // She's back to a known room, let's randomize the direction
+                    this.changeDirection(worker)
                 }
             }
-            // There is work to be done, tell the worker to build
-            if (constructionSite) {
-                if (worker.build(constructionSite) == ERR_NOT_IN_RANGE) {
-                    worker.moveTo(constructionSite, {visualizePathStyle: {stroke: '#ffff99'}});
-                }
-            // If there's nothing to build, tell them to help the upgraders
+            // Tells the explorer to move
+            worker.move(worker.memory.directions[0])
+            const lastPosition = new RoomPosition(worker.memory.lastPosition.x, worker.memory.lastPosition.y, worker.room.name)
+            // If she didn't move, it's facing an obstacle, we need to change direction
+            if (_.isEqual(worker.pos, lastPosition)) {
+                this.changeDirection(worker)
             } else {
-                const helpUpgraders = true
-                if (worker.upgradeController(worker.room.controller) == ERR_NOT_IN_RANGE) {
-                    worker.moveTo(worker.room.controller, {visualizePathStyle: {stroke: '#ffffff'}});
-                }
+                worker.memory.lastPosition = worker.pos
             }
-        // Time to gather energy
-        } else {
-            // Switches the energy source depending on the task assigned
-            const energySource = helpUpgraders ? Game.getObjectById(resources.getUpgradeEnergySources(worker.room.name).id) : Game.getObjectById(worker.memory.energySource.id)
-            const harvestResult = worker.harvest(energySource)
-            if (harvestResult == ERR_NOT_IN_RANGE) {
-                worker.moveTo(energySource, {visualizePathStyle: {stroke: '#ffaa00'}})
-            }
-        }
-    })
-	}
+        })
+    },
+
+    changeDirection: (worker) => {
+        worker.memory.directions = worker.memory.directions.slice(-3).concat(worker.memory.directions.splice(0,5))
+    }
 }
 
-module.exports = roleBuilder;
+module.exports = roleExplorer;
