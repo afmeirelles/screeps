@@ -66,15 +66,15 @@ const population = {
         // The skillset depends on the enegy capacity available
         switch (roomEnergyCapacity) {
             case 300: {
-                bodyParts = [WORK, CARRY, MOVE, MOVE, MOVE]
+                bodyParts = [WORK, CARRY, CARRY, MOVE, MOVE]
                 break
             }
             case 350: {
-                bodyParts = [WORK, WORK, CARRY, MOVE, MOVE]
+                bodyParts = [WORK, WORK, CARRY, CARRY, MOVE]
                 break
             }
             case 400: {
-                bodyParts = [WORK, WORK, CARRY, MOVE, MOVE, MOVE]
+                bodyParts = [WORK, WORK, CARRY, CARRY, MOVE, MOVE]
                 break
             }
             case 450: {
@@ -82,11 +82,11 @@ const population = {
                 break
             }
             case 500: {
-                bodyParts = [WORK, WORK, WORK, CARRY, MOVE, MOVE]
+                bodyParts = [WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE]
                 break
             }
             default: {
-                bodyParts = [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE]
+                bodyParts = [WORK, WORK, WORK, CARRY, CARRY, CARRY, MOVE, MOVE]
                 break
             }
         }
