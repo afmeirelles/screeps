@@ -19,9 +19,9 @@ const roleBuilder = {
 
   	    if (worker.memory.building) {
             // Gets the build target
-            let constructionSite = Game.getObjectById(worker.memory.targetId)
+            let builderTarget = Game.getObjectById(worker.memory.targetId)
             // If this there's no target locked
-            if (!constructionSite) {
+            if (!builderTarget) {
                 // Checks for construction sites
                 const unfinishedBuildings = worker.room.find(FIND_CONSTRUCTION_SITES, {
                     filter: (site) => {
@@ -30,14 +30,24 @@ const roleBuilder = {
                 })
                 // If there are unfinished buildings, lock it as the target
                 if (unfinishedBuildings.length) {
-                    constructionSite = unfinishedBuildings.pop()
-                    worker.memory.targetId = constructionSite.id
+                    builderTarget = unfinishedBuildings.pop()
+                    worker.memory.targetId = builderTarget.id
+                } else {
+                    const rottenRoads = room.find(FIND_STRUCTURES, {
+                        filter: (structure) => {
+                            return structure.structureType == STRUCTURE_ROAD && structure.ticksToDecay < 200
+                        }
+                    })
+                    if (unfinishedBuildings.length) {
+                        builderTarget = unfinishedBuildings.pop()
+                        worker.memory.targetId = builderTarget.id
+                    }
                 }
             }
             // There is work to be done, tell the worker to build
-            if (constructionSite) {
-                if (worker.build(constructionSite) == ERR_NOT_IN_RANGE) {
-                    worker.moveTo(constructionSite);
+            if (builderTarget) {
+                if (worker.build(builderTarget) == ERR_NOT_IN_RANGE) {
+                    worker.moveTo(builderTarget)
                 }
             // If there's nothing to build, tell them to help the upgraders
             } else {

@@ -50,7 +50,7 @@ const population = {
      * Creates a new explorer
      */
     newExplorer: (roomName) => {
-        const bodyParts = [MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
+        const bodyParts = [MOVE, MOVE, MOVE]
         const name = resources.getSpawn(roomName).createCreep(bodyParts, undefined, {role: C.WORKERS.ROLE.EXPLORER})
         if (_.isString(name)) {
             console.log('Spawning new explorer:', name)
@@ -78,7 +78,7 @@ const population = {
                 break
             }
             case 450: {
-                bodyParts = [WORK, WORK, WORK, CARRY, MOVE, MOVE]
+                bodyParts = [WORK, WORK, WORK, CARRY, CARRY, MOVE]
                 break
             }
             case 500: {
@@ -99,7 +99,7 @@ const population = {
             return null
         }
         // Sets the default energy source
-        workerSource = resources.getHarvestEnergySources(room.name)
+        let workerSource = resources.getHarvestEnergySources(room.name)
         // For upgraders, we assign a dedicated energy source, if available
         if (role === C.WORKERS.ROLE.UPGRADER) {
             workerSource = resources.getUpgradeEnergySources(room.name)

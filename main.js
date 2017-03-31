@@ -1,3 +1,4 @@
+helpers = require('helpers')
 const roleHarvester = require('role.harvester')
 const roleUpgrader = require('role.upgrader')
 const roleBuilder = require('role.builder')
@@ -39,7 +40,7 @@ module.exports.loop = function () {
             return
         }
 
-        // Cateorize creeps based on their roles
+        // Categorize creeps based on their roles
         const categorizedWorkers = population.workersByRole(Game.creeps)
 
         // Checks if there's need for creating new workers
