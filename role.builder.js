@@ -4,7 +4,7 @@ resources = require('resources')
  */
 const roleBuilder = {
 
-    run: function(workers) {
+    run: function(workers, room) {
       workers.forEach( (worker) => {
 
         // Checks whether the workers should be building
@@ -23,24 +23,22 @@ const roleBuilder = {
             // If this there's no target locked
             if (!builderTarget) {
                 // Checks for construction sites
-                const unfinishedBuildings = worker.room.find(FIND_CONSTRUCTION_SITES, {
+                const unfinishedBuildings = worker.pos.findClosestByPath(FIND_CONSTRUCTION_SITES, {
                     filter: (site) => {
                         return site.progress < site.progressTotal
                     }
                 })
                 // If there are unfinished buildings, lock it as the target
-                if (unfinishedBuildings.length) {
-                    builderTarget = unfinishedBuildings.pop()
-                    worker.memory.targetId = builderTarget.id
+                if (unfinishedBuildings) {
+                    worker.memory.targetId = unfinishedBuildings.id
                 } else {
-                    const rottenRoads = room.find(FIND_STRUCTURES, {
+                    const rottenRoads = worker.pos.findClosestByPath(FIND_STRUCTURES, {
                         filter: (structure) => {
                             return structure.structureType == STRUCTURE_ROAD && structure.ticksToDecay < 200
                         }
                     })
-                    if (unfinishedBuildings.length) {
-                        builderTarget = unfinishedBuildings.pop()
-                        worker.memory.targetId = builderTarget.id
+                    if (rottenRoads) {
+                        worker.memory.targetId = rottenRoads.id
                     }
                 }
             }

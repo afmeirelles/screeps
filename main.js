@@ -49,7 +49,7 @@ module.exports.loop = function () {
         // Runs each worker role logic
         if (!_.isEmpty(categorizedWorkers.harvester)) roleHarvester.run(categorizedWorkers.harvester)
         if (!_.isEmpty(categorizedWorkers.upgrader)) roleUpgrader.run(categorizedWorkers.upgrader)
-        if (!_.isEmpty(categorizedWorkers.builder)) roleBuilder.run(categorizedWorkers.builder)
+        if (!_.isEmpty(categorizedWorkers.builder)) roleBuilder.run(categorizedWorkers.builder, room)
         if (!_.isEmpty(categorizedWorkers.explorer)) roleExplorer.run(categorizedWorkers.explorer, room.name)
 
         // Checks for infrasctructure upgrades
